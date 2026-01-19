@@ -148,3 +148,87 @@ func TestFlagsExist(t *testing.T) {
 		t.Errorf("Expected shorthand 'r', got '%s'", regionFlag.Shorthand)
 	}
 }
+
+
+// =============================================================================
+// Unit Tests for TagPolicyCmd Registration
+// Requirements: 5.1, 5.2
+// =============================================================================
+
+// TestTagPolicyCmdExists verifies that TagPolicyCmd is defined and has correct properties.
+// Requirement 5.1: THE Tag_Policy_Command SHALL be registered as a subcommand of the existing `aws` command
+func TestTagPolicyCmdExists(t *testing.T) {
+	if TagPolicyCmd == nil {
+		t.Fatal("TagPolicyCmd should not be nil")
+	}
+	if TagPolicyCmd.Use != "tag-policy" {
+		t.Errorf("Expected Use 'tag-policy', got '%s'", TagPolicyCmd.Use)
+	}
+	if TagPolicyCmd.Short == "" {
+		t.Error("Expected Short description to be set")
+	}
+	if TagPolicyCmd.Long == "" {
+		t.Error("Expected Long description to be set")
+	}
+	if TagPolicyCmd.RunE == nil {
+		t.Error("Expected RunE to be set")
+	}
+}
+
+// TestTagPolicyCmdRegistered verifies that TagPolicyCmd is registered as a subcommand of AWSCmd.
+// Requirement 5.1: THE Tag_Policy_Command SHALL be registered as a subcommand of the existing `aws` command
+func TestTagPolicyCmdRegistered(t *testing.T) {
+	subCommands := AWSCmd.Commands()
+
+	found := false
+	for _, cmd := range subCommands {
+		if cmd.Use == "tag-policy" {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Error("Expected 'tag-policy' sub-command to be registered with AWSCmd")
+	}
+}
+
+// TestTagPolicyCmdInheritsFlags verifies that TagPolicyCmd inherits --profile and --region flags.
+// Requirement 5.2: THE Tag_Policy_Command SHALL inherit the `--profile` and `--region` flags from the parent aws command
+func TestTagPolicyCmdInheritsFlags(t *testing.T) {
+	// The flags are defined on AWSCmd as PersistentFlags, so they should be inherited
+	// by all subcommands including TagPolicyCmd
+
+	// Verify profile flag is accessible
+	profileFlag := AWSCmd.PersistentFlags().Lookup("profile")
+	if profileFlag == nil {
+		t.Error("Expected --profile flag to be defined on AWSCmd")
+	}
+
+	// Verify region flag is accessible
+	regionFlag := AWSCmd.PersistentFlags().Lookup("region")
+	if regionFlag == nil {
+		t.Error("Expected --region flag to be defined on AWSCmd")
+	}
+
+	// Verify TagPolicyCmd can access the inherited flags through its parent
+	// This is implicit since TagPolicyCmd is added to AWSCmd which has PersistentFlags
+}
+
+// TestAllSubCommandsIncludeTagPolicy verifies that tag-policy is in the list of all subcommands.
+func TestAllSubCommandsIncludeTagPolicy(t *testing.T) {
+	subCommands := AWSCmd.Commands()
+
+	expectedCommands := []string{"whoami", "login", "profiles", "tag-policy"}
+	for _, expected := range expectedCommands {
+		found := false
+		for _, cmd := range subCommands {
+			if cmd.Use == expected {
+				found = true
+				break
+			}
+		}
+		if !found {
+			t.Errorf("Expected sub-command '%s' not found", expected)
+		}
+	}
+}

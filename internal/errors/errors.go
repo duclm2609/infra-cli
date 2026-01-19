@@ -210,6 +210,37 @@ func NewAWSAPIError(awsCode, awsMessage, service, operation string, cause error)
 	}
 }
 
+// NewNoTagPolicyError creates an error when no tag policy exists
+func NewNoTagPolicyError() *AWSAPIError {
+	return &AWSAPIError{
+		InfraError: InfraError{
+			Category:   CategoryAWSAPI,
+			Code:       "NO_TAG_POLICY",
+			Message:    "No tag policy in effect",
+			Details:    "The account does not have an effective tag policy.",
+			Suggestion: "Tag policies are managed through AWS Organizations. Contact your organization administrator.",
+		},
+		Service:   "organizations",
+		Operation: "DescribeEffectivePolicy",
+	}
+}
+
+// NewNotInOrganizationError creates an error when account is not in an org
+func NewNotInOrganizationError(cause error) *AWSAPIError {
+	return &AWSAPIError{
+		InfraError: InfraError{
+			Category:   CategoryAWSAPI,
+			Code:       "NOT_IN_ORGANIZATION",
+			Message:    "Account is not part of an AWS Organization",
+			Details:    "Tag policies require the account to be a member of an AWS Organization.",
+			Suggestion: "Join an AWS Organization or create one to use tag policies.",
+			Cause:      cause,
+		},
+		Service:   "organizations",
+		Operation: "DescribeEffectivePolicy",
+	}
+}
+
 // InputError represents input validation errors
 type InputError struct {
 	InfraError

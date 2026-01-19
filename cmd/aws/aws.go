@@ -74,6 +74,7 @@ func init() {
 	AWSCmd.AddCommand(WhoamiCmd)
 	AWSCmd.AddCommand(LoginCmd)
 	AWSCmd.AddCommand(ProfilesCmd)
+	AWSCmd.AddCommand(TagPolicyCmd)
 }
 
 // GetProfile returns the resolved AWS profile
