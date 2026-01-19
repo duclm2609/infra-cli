@@ -109,8 +109,9 @@ func runWhoami() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	// Validate credentials first
-	if err := authenticator.ValidateCredentials(ctx); err != nil {
+	// Get caller identity (validates credentials and returns account info)
+	identity, err := authenticator.GetCallerIdentity(ctx)
+	if err != nil {
 		return infraerrors.NewCredentialsNotFoundError(resolvedProfile, err)
 	}
 
@@ -119,6 +120,9 @@ func runWhoami() error {
 		return infraerrors.NewAuthError("CREDS_FAILED", "Failed to get credentials", resolvedProfile, err)
 	}
 
+	fmt.Printf("Account: %s\n", identity.Account)
+	fmt.Printf("Arn: %s\n", identity.Arn)
+	fmt.Printf("UserId: %s\n", identity.UserId)
 	fmt.Printf("Profile: %s\n", resolvedProfile)
 	fmt.Printf("Region: %s\n", getEffectiveRegion(resolvedProfile))
 	fmt.Printf("Credential Source: %s\n", creds.Source)

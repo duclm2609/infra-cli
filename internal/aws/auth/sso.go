@@ -114,6 +114,13 @@ func (a *SSOAuthenticator) GetCredentials(ctx context.Context) (*Credentials, er
 	}, nil
 }
 
+// CallerIdentity represents the AWS caller identity
+type CallerIdentity struct {
+	Account string
+	Arn     string
+	UserId  string
+}
+
 // ValidateCredentials validates that credentials are available and valid
 func (a *SSOAuthenticator) ValidateCredentials(ctx context.Context) error {
 	cfg, err := a.loadConfig(ctx)
@@ -129,6 +136,26 @@ func (a *SSOAuthenticator) ValidateCredentials(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// GetCallerIdentity returns the AWS caller identity (account, ARN, user ID)
+func (a *SSOAuthenticator) GetCallerIdentity(ctx context.Context) (*CallerIdentity, error) {
+	cfg, err := a.loadConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("failed to load AWS config: %w", err)
+	}
+
+	stsClient := sts.NewFromConfig(cfg)
+	result, err := stsClient.GetCallerIdentity(ctx, &sts.GetCallerIdentityInput{})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get caller identity: %w", err)
+	}
+
+	return &CallerIdentity{
+		Account: aws.ToString(result.Account),
+		Arn:     aws.ToString(result.Arn),
+		UserId:  aws.ToString(result.UserId),
+	}, nil
 }
 
 // GetConfig returns the AWS config for the profile
