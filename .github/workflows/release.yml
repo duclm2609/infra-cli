@@ -1,14 +1,13 @@
 name: Build and Release
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+'
+      - 'v[0-9]+.[0-9]+.[0-9]+-*'
 
 jobs:
   build-and-release:
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -22,22 +21,20 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Get version from PR
+      - name: Get version from tag
         id: version
         run: |
-          # Extract version from go.mod or use timestamp-based version
-          VERSION="v$(date +'%Y%m%d.%H%M%S')"
-          # Or use semantic versioning from tag/branch
-          if [[ "${{ github.event.pull_request.title }}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
-            VERSION="${BASH_REMATCH[0]}"
-          fi
+          VERSION=${GITHUB_REF#refs/tags/}
           echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # Strip 'v' prefix for build version
+          BUILD_VERSION=${VERSION#v}
+          echo "build_version=$BUILD_VERSION" >> $GITHUB_OUTPUT
 
       - name: Run tests
         run: make test
 
       - name: Build all platforms
-        run: make build-all VERSION=${{ steps.version.outputs.version }}
+        run: make build-all VERSION=${{ steps.version.outputs.build_version }}
 
       - name: Create zip archives
         run: |
@@ -58,9 +55,6 @@ jobs:
           tag_name: ${{ steps.version.outputs.version }}
           name: Release ${{ steps.version.outputs.version }}
           body: |
-            ## Changes
-            ${{ github.event.pull_request.body }}
-            
             ## Downloads
             - **macOS (Intel)**: infra-darwin-amd64.zip
             - **macOS (Apple Silicon)**: infra-darwin-arm64.zip
@@ -74,6 +68,6 @@ jobs:
             bin/infra-linux-arm64.zip
             bin/infra-windows-amd64.zip
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(steps.version.outputs.version, '-') }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
