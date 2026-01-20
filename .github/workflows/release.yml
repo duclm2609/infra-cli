@@ -1,0 +1,79 @@
+name: Build and Release
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+
+      - name: Get version from PR
+        id: version
+        run: |
+          # Extract version from go.mod or use timestamp-based version
+          VERSION="v$(date +'%Y%m%d.%H%M%S')"
+          # Or use semantic versioning from tag/branch
+          if [[ "${{ github.event.pull_request.title }}" =~ v[0-9]+\.[0-9]+\.[0-9]+ ]]; then
+            VERSION="${BASH_REMATCH[0]}"
+          fi
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Run tests
+        run: make test
+
+      - name: Build all platforms
+        run: make build-all VERSION=${{ steps.version.outputs.version }}
+
+      - name: Create zip archives
+        run: |
+          cd bin
+          for platform in darwin-amd64 darwin-arm64 linux-amd64 linux-arm64 windows-amd64; do
+            cd $platform
+            if [ "$platform" = "windows-amd64" ]; then
+              zip ../infra-${platform}.zip infra.exe
+            else
+              zip ../infra-${platform}.zip infra
+            fi
+            cd ..
+          done
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          name: Release ${{ steps.version.outputs.version }}
+          body: |
+            ## Changes
+            ${{ github.event.pull_request.body }}
+            
+            ## Downloads
+            - **macOS (Intel)**: infra-darwin-amd64.zip
+            - **macOS (Apple Silicon)**: infra-darwin-arm64.zip
+            - **Linux (x64)**: infra-linux-amd64.zip
+            - **Linux (ARM64)**: infra-linux-arm64.zip
+            - **Windows (x64)**: infra-windows-amd64.zip
+          files: |
+            bin/infra-darwin-amd64.zip
+            bin/infra-darwin-arm64.zip
+            bin/infra-linux-amd64.zip
+            bin/infra-linux-arm64.zip
+            bin/infra-windows-amd64.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
