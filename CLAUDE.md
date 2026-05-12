@@ -1,8 +1,73 @@
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 
-## Commands
+**Tradeoff:** These guidelines bias toward caution over speed. For trivial tasks, use judgment.
+
+## 1. Think Before Coding
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+Before implementing:
+- State your assumptions explicitly. If uncertain, ask.
+- If multiple interpretations exist, present them - don't pick silently.
+- If a simpler approach exists, say so. Push back when warranted.
+- If something is unclear, stop. Name what's confusing. Ask.
+
+## 2. Simplicity First
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- No features beyond what was asked.
+- No abstractions for single-use code.
+- No "flexibility" or "configurability" that wasn't requested.
+- No error handling for impossible scenarios.
+- If you write 200 lines and it could be 50, rewrite it.
+
+Ask yourself: "Would a senior engineer say this is overcomplicated?" If yes, simplify.
+
+## 3. Surgical Changes
+
+**Touch only what you must. Clean up only your own mess.**
+
+When editing existing code:
+- Don't "improve" adjacent code, comments, or formatting.
+- Don't refactor things that aren't broken.
+- Match existing style, even if you'd do it differently.
+- If you notice unrelated dead code, mention it - don't delete it.
+
+When your changes create orphans:
+- Remove imports/variables/functions that YOUR changes made unused.
+- Don't remove pre-existing dead code unless asked.
+
+The test: Every changed line should trace directly to the user's request.
+
+## 4. Goal-Driven Execution
+
+**Define success criteria. Loop until verified.**
+
+Transform tasks into verifiable goals:
+- "Add validation" → "Write tests for invalid inputs, then make them pass"
+- "Fix the bug" → "Write a test that reproduces it, then make it pass"
+- "Refactor X" → "Ensure tests pass before and after"
+
+For multi-step tasks, state a brief plan:
+```
+1. [Step] → verify: [check]
+2. [Step] → verify: [check]
+3. [Step] → verify: [check]
+```
+
+Strong success criteria let you loop independently. Weak criteria ("make it work") require constant clarification.
+
+---
+
+**These guidelines are working if:** fewer unnecessary changes in diffs, fewer rewrites due to overcomplication, and clarifying questions come before implementation rather than after mistakes.
+
+## Project-Specific Guidelines
+
+## 1. Commands
 
 ```bash
 make build          # Build binary for current platform → bin/infra
@@ -21,7 +86,7 @@ go test -v -run TestFunctionName ./internal/aws/tagpolicy/
 
 Version is injected at build time via ldflags: `-X github.com/user/infra-cli/cmd/infra.Version=$(VERSION)`
 
-## Architecture
+## 2. Architecture
 
 `main.go` → `cmd/infra.Execute()` → Cobra root command → sub-commands
 
@@ -39,16 +104,10 @@ Version is injected at build time via ldflags: `-X github.com/user/infra-cli/cmd
 
 **Adding a new AWS sub-command:** add to `cmd/aws/`, register in `cmd/aws/aws.go`'s `init()`.
 
-## Testing
+## 3. Testing
 
 Uses both unit tests and property-based tests via `github.com/leanovate/gopter`.
 
 Property tests tag format: `Feature: <spec-name>, Property N: <property_text>`
 
-Test files live alongside source (`*_test.go` in same package). Test data in `internal/aws/tagpolicy/testdata/`.
-
-## Specs
-
-`.kiro/specs/` contains design documents with correctness properties, component interfaces, and error handling tables. Read these before implementing new features in their respective areas:
-- `devops-cli-tool/` — overall CLI architecture, output formatting, profile resolution
-- `aws-tag-policy/` — tag-policy TUI command design and property tests
+Test files live alongside source (`*_test.go` in same package). Test data in `internal/aws/tagpolicy/testdata/`
