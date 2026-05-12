@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/user/infra-cli/internal/aws/tagpolicy"
+	"github.com/duclm2609/infra-cli/internal/aws/tagpolicy"
 )
 
 // TagPolicyCmd represents the tag-policy subcommand

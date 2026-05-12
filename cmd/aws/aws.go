@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/user/infra-cli/internal/aws/auth"
-	"github.com/user/infra-cli/internal/aws/profile"
-	infraerrors "github.com/user/infra-cli/internal/errors"
+	"github.com/duclm2609/infra-cli/internal/aws/auth"
+	"github.com/duclm2609/infra-cli/internal/aws/profile"
+	infraerrors "github.com/duclm2609/infra-cli/internal/errors"
 )
 
 var (

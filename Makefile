@@ -12,7 +12,7 @@ GOCLEAN=$(GOCMD) clean
 GOMOD=$(GOCMD) mod
 
 # Build flags
-LDFLAGS=-ldflags "-X github.com/user/infra-cli/cmd/infra.Version=$(VERSION)"
+LDFLAGS=-ldflags "-X github.com/duclm2609/infra-cli/cmd/infra.Version=$(VERSION)"
 
 .PHONY: all build build-all test clean deps lint
 
