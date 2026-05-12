@@ -10,26 +10,29 @@ A cross-platform CLI tool for DevOps/CloudOps engineers to automate daily tasks 
 
 ## Installation
 
+### macOS / Linux (one-liner)
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/duclm2609/infra-cli/main/install.sh | bash
+```
+
+Installs to `/usr/local/bin/infra`. Auto-detects OS and architecture.
+
+### Windows (PowerShell)
+
+```powershell
+irm https://raw.githubusercontent.com/duclm2609/infra-cli/main/install.ps1 | iex
+```
+
+Installs to `$env:LOCALAPPDATA\infra\infra.exe` and adds it to your PATH.
+
 ### From Source
 
 ```bash
-# Clone and build
-git clone https://github.com/user/infra-cli.git
+git clone https://github.com/duclm2609/infra-cli.git
 cd infra-cli
 make build
-
-# Or build for all platforms
-make build-all
 ```
-
-### Pre-built Binaries
-
-Download from releases and add to your PATH:
-- `infra-darwin-amd64` (MacOS Intel)
-- `infra-darwin-arm64` (MacOS Apple Silicon)
-- `infra-linux-amd64` (Linux x64)
-- `infra-linux-arm64` (Linux ARM)
-- `infra-windows-amd64.exe` (Windows)
 
 ## Usage
 

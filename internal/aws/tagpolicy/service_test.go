@@ -11,7 +11,7 @@ import (
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
 
-	infraerrors "github.com/user/infra-cli/internal/errors"
+	infraerrors "github.com/duclm2609/infra-cli/internal/errors"
 )
 
 // =============================================================================

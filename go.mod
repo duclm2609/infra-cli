@@ -1,4 +1,4 @@
-module github.com/user/infra-cli
+module github.com/duclm2609/infra-cli
 
 go 1.25
 
