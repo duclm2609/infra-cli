@@ -10,7 +10,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/organizations/types"
 	"github.com/aws/smithy-go"
 
-	infraerrors "github.com/user/infra-cli/internal/errors"
+	infraerrors "github.com/duclm2609/infra-cli/internal/errors"
 )
 
 // OrganizationsClient interface for AWS Organizations operations.

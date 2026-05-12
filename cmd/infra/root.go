@@ -5,10 +5,10 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/user/infra-cli/cmd/aws"
-	"github.com/user/infra-cli/internal/config"
-	infraerrors "github.com/user/infra-cli/internal/errors"
-	infraoutput "github.com/user/infra-cli/internal/output"
+	"github.com/duclm2609/infra-cli/cmd/aws"
+	"github.com/duclm2609/infra-cli/internal/config"
+	infraerrors "github.com/duclm2609/infra-cli/internal/errors"
+	infraoutput "github.com/duclm2609/infra-cli/internal/output"
 )
 
 // Version is set at build time via ldflags

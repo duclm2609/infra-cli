@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/user/infra-cli/cmd/infra"
+	"github.com/duclm2609/infra-cli/cmd/infra"
 )
 
 func main() {
