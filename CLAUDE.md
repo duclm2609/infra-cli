@@ -67,7 +67,32 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Project-Specific Guidelines
 
-## 1. Commands
+## 1. Workflow
+
+When starting a new implementation, always create a new Git branch before making any code changes.
+
+Branch naming convention:
+
+* feature/<short-description>
+* fix/<short-description>
+* refactor/<short-description>
+
+Examples:
+
+* feature/user-authentication
+* fix/prometheus-alert-link
+* refactor/aws-session-manager
+
+Before writing code:
+
+1. Check current branch
+2. Pull latest changes from the default branch
+3. Create and switch to a new branch
+4. Confirm the branch name before proceeding
+
+Never implement new features directly on `main` or `master`.
+
+## 2. Commands
 
 ```bash
 make build          # Build binary for current platform → bin/infra
@@ -86,7 +111,7 @@ go test -v -run TestFunctionName ./internal/aws/tagpolicy/
 
 Version is injected at build time via ldflags: `-X github.com/user/infra-cli/cmd/infra.Version=$(VERSION)`
 
-## 2. Architecture
+## 3. Architecture
 
 `main.go` → `cmd/infra.Execute()` → Cobra root command → sub-commands
 
@@ -104,7 +129,7 @@ Version is injected at build time via ldflags: `-X github.com/user/infra-cli/cmd
 
 **Adding a new AWS sub-command:** add to `cmd/aws/`, register in `cmd/aws/aws.go`'s `init()`.
 
-## 3. Testing
+## 4. Testing
 
 Uses both unit tests and property-based tests via `github.com/leanovate/gopter`.
 
